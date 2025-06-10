@@ -1,3 +1,6 @@
+# Done with Github copilot - I did some little bits.
+# Will add more fnctionalities
+ 
 import os
 import sys
 import re
