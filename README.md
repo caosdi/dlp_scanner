@@ -43,3 +43,4 @@ py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments\email.
 
 - **Validate SSNs:** [ssnregistry.org/validate](https://www.ssnregistry.org/validate/)
 - **Validate Credit Cards:** [validcreditcardnumber.com](https://www.validcreditcardnumber.com/)
+- **Validate NDC:** [dps.fda.gov/ndc](https://dps.fda.gov/ndc/)
