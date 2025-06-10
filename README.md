@@ -31,6 +31,16 @@ py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments\email.
 
 - You can also provide a folder containing `.eml` files or a single attachment (e.g., PDF, DOCX, XLSX) as the third argument.
 
+When you run the script, the output will look similar to:
+
+```powershell
+PS C:\Users\dcastroosorio\Downloads\Info\DLP> py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments\email.eml
+ 
+email.eml
+  [EMAIL_BODY]: 6225197124481425  [category: CreditCard]
+  cnBan-KKKKKKK.txt: 6225197124481425  [category: CreditCard]
+```
+
 ## Notes
 
 - To convert `.msg` files to `.eml`, use:
