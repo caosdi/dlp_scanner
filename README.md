@@ -9,7 +9,7 @@
 
 2. **Prepare your workspace**
    - Create a folder on your Desktop (e.g., `dlp_scanner`).
-   - Save the script (`dlp_email_scanner.py`) and the Excel file (`SmartIDDictionaryTerms.xlsx`) in this folder.
+   - Save the script (`dlp_email_scanner.py`) and the Excel file (`SmartIDDictionaryTerms.xlsx`) .
    - Create a subfolder named `attachments` and save `.eml` files or other attachments you want to scan in it.
 
 3. **Install dependencies**
@@ -18,7 +18,7 @@
      ```powershell
      python.exe -m pip install pandas openpyxl python-docx PyPDF2 beautifulsoup4
      ```
-4. Download the `SmartIDDictionaryTerms.xlsx` file from the Guide wiki.
+4. Download the `SmartIDDictionaryTerms.xlsx` file from the Guide wiki. Save the file in the same folder as the script.
    - Not going to add the URL to the wiki as this is not public information
 
 ## Usage
