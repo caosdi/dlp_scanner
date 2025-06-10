@@ -43,6 +43,8 @@ email.eml
 
 ## Notes
 
+- **Do not provide the putput to the customer.** The output is for internal use only.
+
 - To convert `.msg` files to `.eml`, use:
 
   ```bash
@@ -53,6 +55,9 @@ email.eml
     sudo apt install libemail-outlook-message-perl
     ```
 
+- Make sure to use the correct Python version (3.x) to run the script. If you have multiple versions installed, use `py.exe` or specify the full path to the Python 3 executable.
+- The script scans for sensitive information based on the terms defined in `SmartIDDictionaryTerms.xlsx`. It will output matches found in the email body or attachments. So please verify the rule and the terms that are triggering in the email.
+- The script can handle various file types, including `.eml`, `.pdf`, `.docx`, and `.xlsx`. Ensure that the attachments are in the `attachments` folder.
 - **Validate SSNs:** [ssnregistry.org/validate](https://www.ssnregistry.org/validate/)
 - **Validate Credit Cards:** [validcreditcardnumber.com](https://www.validcreditcardnumber.com/)
 - **Validate NDC:** [dps.fda.gov/ndc](https://dps.fda.gov/ndc/)
