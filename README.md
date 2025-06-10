@@ -18,6 +18,8 @@
      ```powershell
      python.exe -m pip install pandas openpyxl python-docx PyPDF2 beautifulsoup4
      ```
+4. Download the `SmartIDDictionaryTerms.xlsx` file from the Guide wiki.
+   - Not going to add the URL to the wiki as this is not public information
 
 ## Usage
 
