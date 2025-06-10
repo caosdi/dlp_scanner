@@ -43,7 +43,7 @@ email.eml
 
 ## Notes
 
-- **Do not provide the putput to the customer.** The output is for internal use only.
+- **Do not provide the output to the customer.** The output is for internal use only.
 
 - To convert `.msg` files to `.eml`, use:
 
