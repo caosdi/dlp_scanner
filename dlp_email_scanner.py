@@ -1,5 +1,5 @@
 # Done with Github copilot - I did some little bits.
-# Will add more fnctionalities
+# Will add more functionalities
  
 import os
 import sys
@@ -11,6 +11,7 @@ from email import policy
 from email.parser import BytesParser
 from docx import Document
 import PyPDF2
+import argparse
 from bs4 import BeautifulSoup  # Add this at the top
 
 # --- Load Dictionary Terms from Excel ---
@@ -130,7 +131,7 @@ def process_attachment(filename, payload):
         return ""
 
 # --- EML email processing ---
-def process_eml(eml_path, dlp_dict):
+def process_eml(eml_path, dlp_dict, check_dict=True, check_ssn=True, check_cc=True, check_dl=True):
     results = []
     with open(eml_path, 'rb') as f:
         msg = BytesParser(policy=policy.default).parse(f)
@@ -143,58 +144,79 @@ def process_eml(eml_path, dlp_dict):
     else:
         body = msg.get_content()
     email_text = f"{subject}\n{body}"
-
-    # Scan email body
-    results += scan_text(email_text, "[EMAIL_BODY]", dlp_dict)
-
-    # Scan attachments
+    results += scan_text(email_text, "[EMAIL_BODY]", dlp_dict, check_dict, check_ssn, check_cc, check_dl)
     for part in msg.iter_attachments():
         filename = part.get_filename()
         if not filename:
             continue
         payload = part.get_payload(decode=True)
         attachment_text = process_attachment(filename, payload)
-        results += scan_text(attachment_text, filename, dlp_dict)
-
+        results += scan_text(attachment_text, filename, dlp_dict, check_dict, check_ssn, check_cc, check_dl)
     return results
 
 # --- Standalone file processing ---
-def process_standalone_file(file_path, dlp_dict):
+def process_standalone_file(file_path, dlp_dict, check_dict=True, check_ssn=True, check_cc=True, check_dl=True):
     ext = file_path.lower().split('.')[-1]
     with open(file_path, 'rb') as f:
         payload = f.read()
     text = process_attachment(file_path, payload)
-    return scan_text(text, os.path.basename(file_path), dlp_dict)
+    return scan_text(text, os.path.basename(file_path), dlp_dict, check_dict, check_ssn, check_cc, check_dl)
 
 # --- Central scan function for all text blocks ---
-def scan_text(text, label, dlp_dict):
+def scan_text(text, label, dlp_dict, check_dict=True, check_ssn=True, check_cc=True, check_dl=True):
     results = []
-
-    dlp_terms = find_dlp_terms(text, dlp_dict)
-    if dlp_terms:
-        results.append({"where": label, "matches": dlp_terms})
-
-    for ssn in find_ssn(text):
-        results.append({"where": label, "matches": [(ssn, "SSN")]})
-
-    for cc in find_credit_cards(text):
-        results.append({"where": label, "matches": [(cc, "CreditCard")]})
-
-    for lic in find_us_driver_license(text):
-        results.append({"where": label, "matches": [(lic, "US Driver License")]})
-
+    if check_dict and dlp_dict:
+        dlp_terms = find_dlp_terms(text, dlp_dict)
+        if dlp_terms:
+            results.append({"where": label, "matches": dlp_terms})
+    if check_ssn:
+        for ssn in find_ssn(text):
+            results.append({"where": label, "matches": [(ssn, "SSN")]})
+    if check_cc:
+        for cc in find_credit_cards(text):
+            results.append({"where": label, "matches": [(cc, "CreditCard")]})
+    if check_dl:
+        for lic in find_us_driver_license(text):
+            results.append({"where": label, "matches": [(lic, "US Driver License")]})
     return results
 
 # --- Main driver ---
+def print_matches(filename, results):
+    if results:
+        print(f"\n{filename}")
+        for item in results:
+            for term, category in item['matches']:
+                print(f"  {item['where']}: {term}  [category: {category}]")
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="DLP Email/File Scanner",
+        usage="dlp_email_scanner.py [dict_path] input_path [--scan [{ssn,cc,dl,dict} ...]]"
+    )
+    parser.add_argument("dict_path", nargs="?", help="SmartIDDictionaryTerms.xlsx (required if scanning for dict terms)")
+    parser.add_argument("input_path", help="emails_folder_or_eml_file_or_attachment")
+    parser.add_argument("--scan", nargs="*", choices=["ssn", "cc", "dl", "dict"], help="What to scan for (default: all)")
+    args = parser.parse_args()
+
+    # Determine what to scan for
+    if args.scan is not None and len(args.scan) > 0:
+        check_dict = "dict" in args.scan
+        check_ssn = "ssn" in args.scan
+        check_cc = "cc" in args.scan
+        check_dl = "dl" in args.scan
+    else:
+        check_dict = check_ssn = check_cc = check_dl = True
+
+    # If dict scan is requested, dict_path must be provided
+    if check_dict and not args.dict_path:
+        parser.error("Dictionary path is required when scanning for dict terms (--scan dict)")
+
+    return args, check_dict, check_ssn, check_cc, check_dl
+
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python dlp_email_scanner.py <SmartIDDictionaryTerms.xlsx> <emails_folder_or_eml_file_or_attachment>")
-        sys.exit(1)
-
-    dlp_dict_path = sys.argv[1]
-    input_path = sys.argv[2]
-    dlp_dict = load_dlp_dict(dlp_dict_path)
-
+    args, check_dict, check_ssn, check_cc, check_dl = parse_args()
+    dlp_dict = load_dlp_dict(args.dict_path) if check_dict and args.dict_path else {}
+    input_path = args.input_path
     if os.path.isdir(input_path):
         all_files = [os.path.join(input_path, f) for f in os.listdir(input_path)]
         eml_files = [f for f in all_files if f.lower().endswith('.eml')]
@@ -209,21 +231,12 @@ def main():
     else:
         print("Invalid input path.")
         sys.exit(1)
-
     for eml_file in eml_files:
-        results = process_eml(eml_file, dlp_dict)
+        results = process_eml(eml_file, dlp_dict, check_dict, check_ssn, check_cc, check_dl)
         print_matches(os.path.basename(eml_file), results)
-
     for file in other_files:
-        results = process_standalone_file(file, dlp_dict)
+        results = process_standalone_file(file, dlp_dict, check_dict, check_ssn, check_cc, check_dl)
         print_matches(os.path.basename(file), results)
-
-def print_matches(filename, results):
-    if results:
-        print(f"\n{filename}")
-        for item in results:
-            for term, category in item['matches']:
-                print(f"  {item['where']}: {term}  [category: {category}]")
 
 if __name__ == "__main__":
     main()

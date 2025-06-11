@@ -11,9 +11,9 @@
    - Create a folder on your Desktop (e.g., `dlp_scanner`).
    - Save the script (`dlp_email_scanner.py`) and the Excel file (`SmartIDDictionaryTerms.xlsx`) .
    - Create a subfolder named `attachments` and save `.eml` files or other attachments you want to scan in it.
-   - This script should create the folders in Desktop
+   - This one-liner should create the folders in Desktop
       ```bash
-      mkdir /mnt/c/Users/$USER/Desktop/dlp; mkdir /mnt/c/Users/$USER/Desktop/dlp/attachments
+      New-Item -Path "C:\Users\$env:USERNAME\Desktop\DLP\attachments" -ItemType Directory
       ```
 3. **Install dependencies**
    - Open PowerShell in your project folder and run:
@@ -29,19 +29,34 @@
 To scan an email or attachment, run:
 
 ```powershell
-py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments\email.eml
+py.exe ./dlp_email_scanner.py [dict_path] input_path [--scan [{ssn,cc,dl,dict} ...]]
 ```
 
 - You can also provide a folder containing `.eml` files or a single attachment (e.g., PDF, DOCX, XLSX) as the third argument.
 
+You can also scan all files in the `attachments` folder at once:
+
+```powershell
+py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments --scan [ssn, cc, dl, dict]
+```
+
+For help and a full list of options, run:
+
+```powershell
+py.exe .\dlp_email_scanner.py -h
+```
+
+If you disable all, the script will default to running all checks.
+
 When you run the script, the output will look similar to:
 
 ```powershell
-PS C:\Users\dcastroosorio\Downloads\Info\DLP> py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments\email.eml
- 
+PS C:\Users\Diego\Desktop\ubuntushared\PE\DLP> py.exe .\dlp_email_scanner.py .\attachments\ --scan ssn
+
 email.eml
-  [EMAIL_BODY]: 6225197124481425  [category: CreditCard]
-  cnBan-KKKKKKK.txt: 6225197124481425  [category: CreditCard]
+  [EMAIL_BODY]: 489-36-8350  [category: SSN]
+  testingDLP.docx: 489-36-8350  [category: SSN]
+  testingDLP.pdf: 489-36-8350  [category: SSN]
 ```
 
 ## Notes
@@ -64,3 +79,4 @@ email.eml
 - **Validate SSNs:** [ssnregistry.org/validate](https://www.ssnregistry.org/validate/)
 - **Validate Credit Cards:** [validcreditcardnumber.com](https://www.validcreditcardnumber.com/)
 - **Validate NDC:** [dps.fda.gov/ndc](https://dps.fda.gov/ndc/)
+
