@@ -28,7 +28,8 @@ def load_dlp_dict(xlsx_path):
 def find_dlp_terms(text, dlp_dict):
     found = []
     for term, category in dlp_dict.items():
-        pattern = re.compile(r'\b' + re.escape(term) + r'\b', re.IGNORECASE)
+        # Remove word boundaries to allow matching terms with special characters
+        pattern = re.compile(re.escape(term), re.IGNORECASE)
         if pattern.search(text):
             found.append((term, category))
     return found
