@@ -12,16 +12,17 @@ from email.parser import BytesParser
 from docx import Document
 import PyPDF2
 import argparse
-from bs4 import BeautifulSoup  # Add this at the top
+from bs4 import BeautifulSoup
+import json
 
-# --- Load Dictionary Terms from Excel ---
-def load_dlp_dict(xlsx_path):
-    xl = pd.ExcelFile(xlsx_path)
+# --- Load Dictionary Terms from json file ---
+def load_dlp_dict(json_path):
+    with open(json_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
     dlp_dict = {}
-    for sheet in xl.sheet_names:
-        df = xl.parse(sheet)
-        for term in df.iloc[:, 0].dropna().astype(str).str.strip():
-            dlp_dict[term] = sheet
+    for category, terms in data.items():
+        for term in terms:
+            dlp_dict[term.strip()] = category
     return dlp_dict
 
 # --- Dictionary-based term search ---

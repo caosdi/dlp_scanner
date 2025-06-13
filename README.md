@@ -21,23 +21,22 @@
      ```powershell
      python.exe -m pip install pandas openpyxl python-docx PyPDF2 beautifulsoup4
      ```
-4. Download the `SmartIDDictionaryTerms.xlsx` file from the Guide wiki. Save the file in the same folder as the script.
-   - Not going to add the URL to the wiki as this is not public information
+4. Download the dictionary from Wiki
 
 ## Usage
 
 To scan an email or attachment, run:
 
 ```powershell
-py.exe ./dlp_email_scanner.py [dict_path] input_path [--scan [{ssn,cc,dl,dict} ...]]
+py.exe ./dlp_email_scanner.py dlp_dict.json input_path [--scan [{ssn,cc,dl,dict} ...]]
 ```
 
-- You can also provide a folder containing `.eml` files or a single attachment (e.g., PDF, DOCX, XLSX) as the third argument.
+- You can provide a folder containing `.eml` files or a single attachment (e.g., PDF, DOCX, XLSX) as the `input_path`.
 
 You can also scan all files in the `attachments` folder at once:
 
 ```powershell
-py.exe .\dlp_email_scanner.py .\SmartIDDictionaryTerms.xlsx .\attachments --scan [ssn, cc, dl, dict]
+py.exe .\dlp_email_scanner.py .\dlp_dict.json .\attachments --scan ssn cc dl dict
 ```
 
 For help and a full list of options, run:
