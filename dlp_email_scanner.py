@@ -195,7 +195,7 @@ def parse_args():
         description="DLP Email/File Scanner",
         usage="dlp_email_scanner.py [dict_path] input_path [--scan [{ssn,cc,dl,dict} ...]]"
     )
-    parser.add_argument("dict_path", nargs="?", help="SmartIDDictionaryTerms.xlsx (required if scanning for dict terms)")
+    parser.add_argument("dict_path", nargs="?", help="dlp_terms.json (required if scanning for dict terms)")
     parser.add_argument("input_path", help="emails_folder_or_eml_file_or_attachment")
     parser.add_argument("--scan", nargs="*", choices=["ssn", "cc", "dl", "dict"], help="What to scan for (default: all)")
     args = parser.parse_args()
